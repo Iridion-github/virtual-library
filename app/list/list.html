@@ -1,0 +1,28 @@
+<div style="display: flex; flex-direction: column; padding: 20px;">
+    <div style="display: flex; justify-content: end;">
+        <a href="#!/addBook" class="btn btn-primary" style="margin: 20px">Aggiungi un libro</a>
+    </div>
+    <div class="w-100" style="display:  flex; flex: 1; justify-content: space-between; background-color: #444444; color: white; padding: 10px;">
+        <button class="btn btn-info btn-sm" data-ng-disabled="disabledPrevPage" ng-click="goPrevPage()"> Indietro</button>
+        <div><small>Pagina: {{ currentPage }} di {{ totalPages }}</small></div>
+        <button class="btn btn-info btn-sm" data-ng-disabled="disabledNextPage" ng-click="goNextPage()"> Avanti</button>
+    </div>
+    <table class="table table-striped table-dark">
+        <thead>
+        <tr>
+            <th scope="col">ISBN</th>
+            <th scope="col">Titolo</th>
+            <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="book in visibleBooks" href="#!/detail" ng-click="onSelectBook(book.id)">
+            <td>{{ book.isbn }}</td>
+            <td>{{ book.title }}</td>
+            <td style="display: flex; justify-content: end">
+                <a href="#!/detail" class="btn btn-primary" ng-click="onSelectBook(book.id)">Dettagli</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
