@@ -144,18 +144,20 @@ angular.module('myApp', [
     //------------------ currentLocation ------------------
 
     $scope.$on('$routeChangeStart', function ($event, next, current) {
-        const controller = next.$$route.controller;
-        switch (controller) {
-            case 'ListController':
-                return $scope.currentLocation = 'Elenco libri';
-            case 'AddBookController':
-                return $scope.currentLocation = 'Aggiunta libro';
-            case 'DetailController':
-                return $scope.currentLocation = 'Dettagli libro';
-            case 'EditBookController':
-                return $scope.currentLocation = 'Modifica libro';
-            default:
-                return 'Home';
+        if (next.$$route) {
+            const controller = next.$$route.controller;
+            switch (controller) {
+                case 'ListController':
+                    return $scope.currentLocation = 'Elenco libri';
+                case 'AddBookController':
+                    return $scope.currentLocation = 'Aggiunta libro';
+                case 'DetailController':
+                    return $scope.currentLocation = 'Dettagli libro';
+                case 'EditBookController':
+                    return $scope.currentLocation = 'Modifica libro';
+                default:
+                    return 'Home';
+            }
         }
     });
 
