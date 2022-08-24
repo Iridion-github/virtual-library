@@ -1,0 +1,31 @@
+<div style="display: flex; flex-direction: column; padding: 20px;">
+    <div style="display: flex; align-items: center">
+        <a href="#!/list" type="button" class="btn btn-secondary mr-2">Torna alla lista</a>
+    </div>
+    <div class="col-md-4 offset-md-4">
+        <div>
+            <form>
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <label for="username">Username</label>
+                        <input id="username" type="text" class="form-control" placeholder=""
+                               ng-model="userToLog.username"
+                        >
+                    </div>
+                    <div class="form-group col-md-12">
+                        <label for="password">Password</label>
+                        <input id="password" type="password" class="form-control" placeholder=""
+                               ng-model="userToLog.password"
+                        >
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div style="display: flex; justify-content: flex-end">
+            <button data-ng-disabled="isDisabledLoginBtn" class="btn btn-primary"
+                    ng-click="tryLogin()">
+                Accedi
+            </button>
+        </div>
+    </div>
+</div>

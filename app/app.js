@@ -31,169 +31,197 @@ angular.module('myApp', [
     'myApp.addBook',
     'myApp.detail',
     'myApp.editBook',
+    'myApp.login',
     'myApp.version'
-]).config(['$locationProvider', '$routeProvider', function ($locationProvider, $routeProvider) {
-    $locationProvider.hashPrefix('!');
-    $routeProvider.otherwise({redirectTo: '/list'});
-}]).controller('StoreController', ['$scope', '$location', function ($scope, $location) {
-
-    //------------------ init ------------------
-    const defaultBooks = getDefaultBooks(35)
-
-    $scope.allBooks = [...defaultBooks];
-
-    $scope.isDisabledAddBook = true;
-
-    $scope.bookToAdd = {
-        isbn: undefined,
-        title: undefined,
-        author: undefined,
-        description: undefined,
-        coverImg: undefined,
-    };
-
-    $scope.selectedBook = undefined;
-
-    $scope.bookToEdit = undefined;
-
-    $scope.bookToDelete = undefined;
-
-    $scope.currentLocation = 'Lista libri';
-
-    $scope.currentPage = 1;
-
-    $scope.totalPages = Math.ceil($scope.allBooks.length / 10);
-
-    $scope.booksPerPage = 10;
-
-    $scope.paginatedBooks = getPaginatedBooks($scope.allBooks, $scope.booksPerPage);
-
-    $scope.visibleBooks = $scope.paginatedBooks[0];
-
-    $scope.loggedUser = undefined;
-
-    //------------------ add ------------------
-
-    $scope.addBook = function (newBook) {
-        $scope.allBooks.push({...newBook, id: Date.now()});
-        $scope.bookToAdd = undefined;
-        $location.path('/list');
-    };
-
-    $scope.$watch('bookToAdd', function () {
-        $scope.isDisabledAddBook = !($scope.bookToAdd.isbn && $scope.bookToAdd.isbn.length &&
-            $scope.bookToAdd.title && $scope.bookToAdd.title.length &&
-            $scope.bookToAdd.author && $scope.bookToAdd.author.length);
-    }, true);
-
-    //------------------ detail ------------------
-
-    $scope.onSelectBook = function (id) {
-        $scope.selectedBook = {...$scope.allBooks.find(b => b.id === id)};
-    }
-
-    $scope.unselectBook = function () {
-        $scope.selectedBook = undefined;
-    }
-
-    //------------------ edit ------------------
-
-    $scope.setBookToEdit = function (id) {
-        $scope.bookToEdit = {...$scope.allBooks.find(b => b.id === id)};
-    }
-
-    $scope.editBook = function (editedBook) {
-        $scope.allBooks = [...$scope.allBooks].map(b => {
-            if (b.id === editedBook.id) {
-                return editedBook;
-            }
-            return b;
-        })
-        $scope.selectedBook = editedBook;
-        $scope.bookToEdit = undefined;
-        $location.path('/detail');
-    };
-
-    $scope.$watch('allBooks', function () {
-        $scope.paginatedBooks = getPaginatedBooks($scope.allBooks, $scope.booksPerPage);
-    }, true);
-
-    $scope.$watch('allBooks', function () {
-        $scope.visibleBooks = $scope.paginatedBooks[$scope.currentPage - 1];
-    }, true);
-
-
-    //------------------ delete ------------------
-
-    $scope.openDeleteBookModal = function (id) {
-        $scope.bookToDelete = {...$scope.allBooks.find(b => b.id === id)};
-    }
-
-    $scope.closeDeleteBookModal = function () {
-        $scope.bookToDelete = undefined;
-    }
-
-    $scope.deleteBook = function (id) {
-        $scope.visibleBooks = $scope.visibleBooks.filter(b => {
-            return b.id !== id
-        })
-        $scope.bookToDelete = undefined;
-        $location.path('/list');
-    };
-
-    //------------------ currentLocation ------------------
-
-    $scope.$on('$routeChangeStart', function ($event, next, current) {
-        if (next.$$route) {
-            const controller = next.$$route.controller;
-            switch (controller) {
-                case 'ListController':
-                    return $scope.currentLocation = 'Elenco libri';
-                case 'AddBookController':
-                    return $scope.currentLocation = 'Aggiunta libro';
-                case 'DetailController':
-                    return $scope.currentLocation = 'Dettagli libro';
-                case 'EditBookController':
-                    return $scope.currentLocation = 'Modifica libro';
-                default:
-                    return 'Home';
-            }
-        }
-    });
-
-    //------------------ pagination ------------------
-
-    $scope.disabledPrevPage = $scope.currentPage < 2;
-
-    $scope.disabledNextPage = $scope.currentPage >= $scope.totalPages - 1;
-
-    $scope.goPrevPage = function () {
-        $scope.currentPage = $scope.currentPage - 1;
-    }
-
-    $scope.goNextPage = function () {
-        $scope.currentPage = $scope.currentPage + 1;
-    }
-
-    $scope.$watch('currentPage', function () {
-        $scope.visibleBooks = $scope.paginatedBooks[$scope.currentPage - 1];
-        $scope.disabledPrevPage = $scope.currentPage < 2;
-        $scope.disabledNextPage = $scope.currentPage > $scope.totalPages - 1;
-    }, true);
-
-    //------------------ loggedUser ------------------
-
-    $scope.login = function () {
-        $scope.loggedUser = {
-            id: 'userId',
-            name: 'Davide',
-            surname: 'Antinori'
+])
+    .config(['$locationProvider', '$routeProvider', function ($locationProvider, $routeProvider) {
+        $locationProvider.hashPrefix('!');
+        $routeProvider.otherwise({redirectTo: '/login'});
+    }])
+    .controller('StoreController', ['$scope', '$location', function ($scope, $location) {
+        //------------------ init ------------------
+        const defaultBooks = getDefaultBooks(35)
+        $scope.allBooks = [...defaultBooks];
+        $scope.isDisabledAddBook = true;
+        $scope.bookToAdd = {
+            isbn: undefined,
+            title: undefined,
+            author: undefined,
+            description: undefined,
+            coverImg: undefined,
         };
-    }
-
-    $scope.logout = function () {
+        $scope.selectedBook = undefined;
+        $scope.bookToEdit = undefined;
+        $scope.bookToDelete = undefined;
+        $scope.currentLocation = 'Elenco libri';
+        $scope.currentPage = 1;
+        $scope.totalPages = Math.ceil($scope.allBooks.length / 10);
+        $scope.booksPerPage = 10;
+        $scope.paginatedBooks = getPaginatedBooks($scope.allBooks, $scope.booksPerPage);
+        $scope.visibleBooks = $scope.paginatedBooks[0];
+        $scope.savedUsers = [{
+            id: 'userId',
+            username: 'admin',
+            password: 'admin',
+            role: 'admin',
+        }]
         $scope.loggedUser = undefined;
-    }
+        $scope.userToLog = {
+            username: undefined,
+            password: undefined,
+        }
+        $scope.isDisabledLoginBtn = true;
 
+        //------------------ add ------------------
+        $scope.addBook = function (newBook) {
+            $scope.allBooks.push({...newBook, id: Date.now()});
+            $scope.bookToAdd = undefined;
+            $location.path('/list');
+        };
 
-}]);
+        $scope.$watch('bookToAdd', function () {
+            $scope.isDisabledAddBook = !($scope.bookToAdd.isbn && $scope.bookToAdd.isbn.length &&
+                $scope.bookToAdd.title && $scope.bookToAdd.title.length &&
+                $scope.bookToAdd.author && $scope.bookToAdd.author.length);
+        }, true);
+
+        //------------------ detail ------------------
+
+        $scope.onSelectBook = function (id) {
+            $scope.selectedBook = {...$scope.allBooks.find(b => b.id === id)};
+        }
+
+        $scope.unselectBook = function () {
+            $scope.selectedBook = undefined;
+        }
+
+        //------------------ edit ------------------
+
+        $scope.setBookToEdit = function (id) {
+            $scope.bookToEdit = {...$scope.allBooks.find(b => b.id === id)};
+        }
+
+        $scope.editBook = function (editedBook) {
+            $scope.allBooks = [...$scope.allBooks].map(b => {
+                if (b.id === editedBook.id) {
+                    return editedBook;
+                }
+                return b;
+            })
+            $scope.selectedBook = editedBook;
+            $scope.bookToEdit = undefined;
+            $location.path('/detail');
+        };
+
+        $scope.$watch('allBooks', function () {
+            $scope.paginatedBooks = getPaginatedBooks($scope.allBooks, $scope.booksPerPage);
+        }, true);
+
+        $scope.$watch('allBooks', function () {
+            $scope.visibleBooks = $scope.paginatedBooks[$scope.currentPage - 1];
+        }, true);
+
+        //------------------ delete ------------------
+
+        $scope.openDeleteBookModal = function (id) {
+            $scope.bookToDelete = {...$scope.allBooks.find(b => b.id === id)};
+        }
+
+        $scope.closeDeleteBookModal = function () {
+            $scope.bookToDelete = undefined;
+        }
+
+        $scope.deleteBook = function (id) {
+            $scope.visibleBooks = $scope.visibleBooks.filter(b => {
+                return b.id !== id
+            })
+            $scope.bookToDelete = undefined;
+            $location.path('/list');
+        };
+
+        //------------------ currentLocation ------------------
+
+        $scope.$on('$routeChangeStart', function ($event, next, current) {
+            if (next.$$route) {
+                const controller = next.$$route.controller;
+                switch (controller) {
+                    case 'ListController':
+                        return $scope.currentLocation = 'Elenco libri';
+                    case 'AddBookController':
+                        return $scope.currentLocation = 'Aggiunta libro';
+                    case 'DetailController':
+                        return $scope.currentLocation = 'Dettagli libro';
+                    case 'EditBookController':
+                        return $scope.currentLocation = 'Modifica libro';
+                    case 'LoginController':
+                        return $scope.currentLocation = 'Login';
+                    default:
+                        return 'Home';
+                }
+            }
+        });
+
+        //------------------ pagination ------------------
+
+        $scope.disabledPrevPage = $scope.currentPage < 2;
+
+        $scope.disabledNextPage = $scope.currentPage >= $scope.totalPages - 1;
+
+        $scope.goPrevPage = function () {
+            $scope.currentPage = $scope.currentPage - 1;
+        }
+
+        $scope.goNextPage = function () {
+            $scope.currentPage = $scope.currentPage + 1;
+        }
+
+        $scope.$watch('currentPage', function () {
+            $scope.visibleBooks = $scope.paginatedBooks[$scope.currentPage - 1];
+            $scope.disabledPrevPage = $scope.currentPage < 2;
+            $scope.disabledNextPage = $scope.currentPage > $scope.totalPages - 1;
+        }, true);
+
+        //------------------ errors ------------------
+
+        $scope.currentError = undefined;
+
+        $scope.showErrorModal = function (errorMsg) {
+            $scope.currentError = errorMsg;
+        }
+
+        $scope.closeErrorModal = function () {
+            $scope.currentError = undefined;
+        }
+
+        //------------------ authentication ------------------
+
+        $scope.$watch('userToLog', function () {
+            $scope.isDisabledLoginBtn = !$scope.userToLog.username || !$scope.userToLog.password;
+        }, true);
+
+        $scope.tryLogin = function () {
+            const targetUser = $scope.savedUsers.find(u => u.username === $scope.userToLog.username);
+            if (targetUser) {
+                const correctPassword = targetUser.password === $scope.userToLog.password;
+                if (correctPassword) {
+                    $scope.loggedUser = {
+                        id: targetUser.id,
+                        username: targetUser.username,
+                        role: targetUser.role,
+                    };
+                    $location.path('/list');
+                    return;
+                }
+            }
+            $scope.showErrorModal('Utente inesistente o dati errati')
+        }
+
+        $scope.logout = function () {
+            $scope.loggedUser = undefined;
+        }
+
+        $scope.isAdmin = function () {
+            return !!$scope.loggedUser && $scope.loggedUser.role === 'admin'
+        }
+
+    }]);

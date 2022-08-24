@@ -12,7 +12,7 @@
                 <div><b>Autore:</b> {{ selectedBook.author }}</div>
                 <div><b>Descrizione:</b> {{ selectedBook.description }}</div>
             </div>
-            <div class="card-body">
+            <div ng-if="isAdmin()" class="card-body">
                 <div class="w-100" style="display: flex; flex-direction: row; justify-content: space-between;">
                     <a href="#!/editBook" class="btn btn-warning" ng-click="setBookToEdit(selectedBook.id)"
                        style="margin-right: 20px">Modifica</a>
