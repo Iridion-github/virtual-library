@@ -132,4 +132,10 @@ angular.module('myApp', [
             })
         };
 
-    }]);
+    }])
+    .component('backToListBtn', {
+        template: `<a href="#!/list" type="button" class="btn btn-secondary mr-2">Torna alla lista</a>`,
+        controller: function BackToListBtnController() {
+            //no need for now;
+        }
+    });
