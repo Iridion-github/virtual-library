@@ -7,5 +7,27 @@ angular.module('myApp.editBook', ['ngRoute'])
             controller: 'EditBookController',
         });
     }])
-    .controller('EditBookController', [function () {
+    .controller('EditBookController', ['$scope', '$location', function ($scope, $location) {
+
+        $scope.currentController = 'EditBookController';
+
+        $scope.bookToEdit = $scope.$parent.bookToEdit;
+
+        $scope.parentAllBooks = $scope.$parent.allBooks;
+
+        $scope.editBook = $scope.$parent.editBook;
+
+        $scope.handleEditBook = function (editedBook) {
+            $scope.editBook(editedBook);
+            $scope.bookToEdit = undefined;
+            $location.path('/detail');
+        };
+
+        $scope.$watch('allBooks', function () {
+            $scope.paginatedBooks = getPaginatedBooks($scope.allBooks, $scope.booksPerPage);
+        }, true);
+
+        $scope.$watch('allBooks', function () {
+            $scope.visibleBooks = $scope.paginatedBooks[$scope.currentPage - 1];
+        }, true);
     }]);

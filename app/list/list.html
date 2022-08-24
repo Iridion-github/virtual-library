@@ -1,9 +1,11 @@
-<div style="display: flex; flex-direction: column; padding: 20px;">
+<div ng-controller="ListController" style="display: flex; flex-direction: column; padding: 20px;">
     <div style="display: flex; justify-content: end;">
         <a ng-if="isAdmin()" href="#!/addBook" class="btn btn-primary" style="margin: 20px">Aggiungi un libro</a>
     </div>
-    <div class="w-100" style="display:  flex; flex: 1; justify-content: space-between; background-color: #444444; color: white; padding: 10px;">
-        <button class="btn btn-info btn-sm" data-ng-disabled="disabledPrevPage" ng-click="goPrevPage()"> Indietro</button>
+    <div class="w-100"
+         style="display:  flex; flex: 1; justify-content: space-between; background-color: #444444; color: white; padding: 10px;">
+        <button class="btn btn-info btn-sm" data-ng-disabled="disabledPrevPage" ng-click="goPrevPage()"> Indietro
+        </button>
         <div><small>Pagina: {{ currentPage }} di {{ totalPages }}</small></div>
         <button class="btn btn-info btn-sm" data-ng-disabled="disabledNextPage" ng-click="goNextPage()"> Avanti</button>
     </div>

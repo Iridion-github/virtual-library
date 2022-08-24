@@ -33,31 +33,30 @@
 </head>
 <body style="background-color: #555555" ng-controller="StoreController">
 
-<!--[if lt IE 7]>
-<p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade
-    your browser</a> to improve your experience.</p>
-<![endif]-->
-
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="display: flex; justify-content: space-between; color: white;">
-    <div>
-        <h3 class="navbar-brand">Libreria Virtuale / {{ currentLocation }}</h3>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
-    <div ng-if="loggedUser===undefined">
-        <a class="btn btn-primary" href="#!/login">Login</a>
-    </div>
-    <div ng-if="!!loggedUser">
-        <small class="mr-3">Utente: <u> {{ loggedUser.username }}</u></small>
-        <button class="btn btn-secondary" ng-click="logout()">Logout</button>
-    </div>
-</nav>
+<div>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark"
+         style="display: flex; justify-content: space-between; color: white;">
+        <div>
+            <h3 class="navbar-brand">Libreria Virtuale / {{ currentLocation }}</h3>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+        <div ng-if="!loggedUser.id">
+            <a class="btn btn-primary" href="#!/login">Login</a>
+        </div>
+        <div ng-if="!!loggedUser.id">
+            <small class="mr-3">Utente: <u> {{ loggedUser.username }}</u></small>
+            <button class="btn btn-secondary" ng-click="unsetLoggedUser()">Logout</button>
+        </div>
+    </nav>
+</div>
 
 <div ng-view></div>
 
-<div ng-cloak ng-if="currentError && currentError.length" class="modal d-block" role="dialog" aria-labelledby="myModalLabel">
+<div ng-cloak ng-if="currentError && currentError.length" class="modal d-block" role="dialog"
+     aria-labelledby="myModalLabel">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -74,10 +73,6 @@
     </div>
 </div>
 
-<!-- In production use:
-<script src="
-        //ajax.googleapis.com/ajax/libs/angularjs/x.x.x/angular.min.js"></script>
-        -->
 <script src="lib/angular/angular.js"></script>
 <script src="lib/angular-route/angular-route.js"></script>
 <script src="app.js"></script>
