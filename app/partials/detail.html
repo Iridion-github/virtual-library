@@ -1,17 +1,19 @@
 <div ng-cloak ng-controller="DetailController">
     <div style="display: flex; flex-direction: column; padding: 20px;">
         <div style="display: flex; align-items: center">
-            <back-to-list-btn />
+            <back-to-list-btn/>
         </div>
-
-        <div style="display: flex; flex-direction: column; align-items: center;">
-            <div class="card text-white bg-dark">
-                <img class="card-img-top" src={{selectedBook.coverImg}} alt="Card image cap">
+        <div style="display: flex; flex-direction: column; align-items: center;" class="col-md-4 offset-md-4">
+            <div class="card text-white bg-dark w-100">
+                <div class="col-md-6 offset-md-3 p-3">
+                    <img class="card-img-top" src={{selectedBook.coverImg}} alt="Card image cap">
+                </div>
                 <div class="card-body">
                     <div><b>Codice ISBN:</b> {{ selectedBook.isbn }}</div>
                     <div><b>Titolo:</b> {{ selectedBook.title }}</div>
                     <div><b>Autore:</b> {{ selectedBook.author }}</div>
                     <div><b>Descrizione:</b> {{ selectedBook.description }}</div>
+                    <div><b>Url immagine di copertina:</b> {{ selectedBook.coverImg }}</div>
                 </div>
                 <div ng-if="isAdmin()" class="card-body">
                     <div class="w-100" style="display: flex; flex-direction: row; justify-content: space-between;">
@@ -49,7 +51,8 @@
                 </div>
                 <div class="modal-footer">
                     <button class="btn" data-dismiss="modal" ng-click="closeDeleteBookModal()">Close</button>
-                    <button class="btn btn-danger" ng-click="handleDeleteBook(bookToDelete.id)">Conferma eliminazione</button>
+                    <button class="btn btn-danger" ng-click="handleDeleteBook(bookToDelete.id)">Conferma eliminazione
+                    </button>
                 </div>
             </div>
         </div>
