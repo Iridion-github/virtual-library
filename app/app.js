@@ -36,6 +36,7 @@ function getPaginatedBooks(allBooks, booksPerPage) {
 
 angular.module('myApp', [
     'ngRoute',
+    'swxLocalStorage',
     'myApp.list',
     'myApp.addBook',
     'myApp.detail',
@@ -65,18 +66,30 @@ angular.module('myApp', [
         return service;
     }])
 
-    .factory('loggedUserService', ['$rootScope', function ($rootScope) {
+    .factory('loggedUserService', ['$rootScope', '$localStorage', function ($rootScope, $localStorage) {
         const service = {
             loggedUser: {
-                id: undefined,
-                username: undefined,
-                role: undefined,
+                id: '',
+                username: '',
+                role: '',
             },
             getLoggedUser: function () {
-                return this.loggedUser;
+                const userInStorageStr = $localStorage.get('loggedUser');
+                const userInStorage = !userInStorageStr ? undefined : JSON.parse(userInStorageStr);
+                if (userInStorage && userInStorage.id && (!this.loggedUser || !this.loggedUser.id)) {
+                    this.loggedUser = userInStorage;
+                    return userInStorage;
+                } else {
+                    return this.loggedUser;
+                }
             },
             setLoggedUser: function (newUser) {
                 this.loggedUser = newUser;
+                if (!newUser) {
+                    $localStorage.remove('loggedUser');
+                } else {
+                    $localStorage.put('loggedUser', JSON.stringify(newUser), 3);
+                }
                 $rootScope.$broadcast('loggedUser:updated', newUser);
             },
             isLoggedIn: function () {
