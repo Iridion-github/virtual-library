@@ -3,7 +3,7 @@
 angular.module('myApp.editBook', ['ngRoute'])
     .config(['$routeProvider', function ($routeProvider) {
         $routeProvider.when('/editBook', {
-            templateUrl: 'editBook/editBook.html',
+            templateUrl: 'partials/editBook.html',
             controller: 'EditBookController',
         });
     }])
