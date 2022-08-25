@@ -1,8 +1,8 @@
-<div ng-controller="AddBookController" style="display: flex; flex-direction: column; padding: 20px;">
+<div ng-controller="AddBookController" class="p-3" style="display: flex; flex-direction: column;">
     <div style="display: flex; align-items: center">
-        <back-to-list-btn />
+        <back-to-list-btn/>
     </div>
-    <div class="col-md-4 offset-md-4">
+    <div class="col-md-4 offset-md-4 bg-secondary p-4">
         <form>
             <div class="form-row">
                 <div class="form-group col-md-12">
@@ -32,10 +32,10 @@
                 </div>
             </div>
         </form>
-    </div>
-    <div style="display: flex; justify-content: flex-end" class="col-md-4 offset-md-4">
-        <button data-ng-disabled="isDisabledAddBook" class="btn btn-primary" ng-click="addBook(bookToAdd)">
-            Salva libro
-        </button>
+        <div style="display: flex; justify-content: flex-end" class="col-md-12 p-0">
+            <button data-ng-disabled="isDisabledAddBook" class="btn btn-primary" ng-click="addBook(bookToAdd)">
+                Salva libro
+            </button>
+        </div>
     </div>
 </div>
