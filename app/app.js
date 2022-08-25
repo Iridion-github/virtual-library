@@ -39,7 +39,7 @@ angular.module('myApp', [
         $locationProvider.hashPrefix('!');
         $routeProvider.otherwise({redirectTo: '/login'});
     }])
-    .controller('StoreController', ['$scope', '$location', function ($scope, $location) {
+    .controller('StoreController', ['$scope', '$location', function ($scope) {
         $scope.currentController = 'StoreController';
 
         //------------------ breadcrumbs ------------------
