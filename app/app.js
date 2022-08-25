@@ -1,18 +1,26 @@
 'use strict';
 
-const letters = Array.from(Array(26)).map((e, i) => i + 65).map((x) => String.fromCharCode(x));
+function generateIsbn(length) {
+    let result = '';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    for (let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() *
+            characters.length));
+    }
+    return result;
+}
 
 function getDefaultBooks(amount) {
     const result = [];
     for (let x = 0; x < amount; x++) {
         result.push({
             id: x.toString(),
-            isbn: `${letters[x]}${letters[x]}${letters[x]}${letters[x]}${letters[x]}${letters[x]}-${x}`,
+            isbn: generateIsbn(12),
             title: `Titolo libro default ${x + 1}`,
             author: `Autore libro default ${x + 1}`,
             description: `Descrizione libro default ${x + 1}`,
             coverImg: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbmpkg-KZ4ezscypPhu3nnrNHwP4WYlTJEkQ&usqp=CAU',
-        },)
+        });
     }
     return result;
 }
@@ -101,7 +109,6 @@ angular.module('myApp', [
         return service;
     }])
 
-
     .factory('booksService', ['$rootScope', function ($rootScope) {
         const service = {
             allBooks: getDefaultBooks(35),
@@ -156,46 +163,68 @@ angular.module('myApp', [
     }])
 
 
-    .run(['$rootScope', '$location', 'loggedUserService', 'currentLocationService', function ($rootScope, $location, loggedUserService, currentLocationService) {
-        $rootScope.$on('$routeChangeStart', function (event, next) {
-            const currentController = next.$$route.controller;
-            const isAdmin = loggedUserService.isAdmin();
-            switch (currentController) {
-                case 'ListController':
-                    currentLocationService.setCurrentLocation('Elenco libri');
-                    return;
-                case 'AddBookController':
-                    currentLocationService.setCurrentLocation('Aggiunta libro');
-                    //requires to be admin
-                    if (!isAdmin) {
-                        $location.path('/list')
-                    }
-                    return;
-                case 'DetailController':
-                    currentLocationService.setCurrentLocation('Dettagli libro');
-                    return;
-                case 'EditBookController':
-                    currentLocationService.setCurrentLocation('Modifica libro');
-                    //requires to be admin
-                    if (!isAdmin) {
-                        $location.path('/list')
-                    }
-                    return;
-                case 'LoginController':
-                    currentLocationService.setCurrentLocation('Login');
-                    //must not be already logged in
-                    const alreadyLoggedIn = loggedUserService.isLoggedIn()
-                    if (alreadyLoggedIn) {
-                        event.preventDefault();
-                        $location.path('/list')
-                    }
-                    return;
-                default:
-                    currentLocationService.setCurrentLocation('Home');
-                    return;
-            }
-        });
-    }])
+    .run([
+        '$rootScope',
+        '$location',
+        'loggedUserService',
+        'currentLocationService',
+        'booksService',
+        function (
+            $rootScope,
+            $location,
+            loggedUserService,
+            currentLocationService,
+            booksService
+        ) {
+            $rootScope.$on('$routeChangeStart', function (event, next) {
+                const currentController = next.$$route.controller;
+                const isAdmin = loggedUserService.isAdmin();
+                const selectedBook = booksService.getSelectedBook();
+                const bookToEdit = booksService.getBookToEdit();
+                switch (currentController) {
+                    case 'ListController':
+                        currentLocationService.setCurrentLocation('Elenco libri');
+                        return;
+                    case 'AddBookController':
+                        currentLocationService.setCurrentLocation('Aggiunta libro');
+                        //requires to be admin
+                        if (!isAdmin) {
+                            $location.path('/list')
+                        }
+                        return;
+                    case 'DetailController':
+                        currentLocationService.setCurrentLocation('Dettagli libro');
+                        //a book must be selected
+                        if (!selectedBook || !selectedBook.isbn) {
+                            $location.path('/list');
+                        }
+                        return;
+                    case 'EditBookController':
+                        currentLocationService.setCurrentLocation('Modifica libro');
+                        //requires to be admin
+                        if (!isAdmin) {
+                            $location.path('/list')
+                        }
+                        //a book must be in edit mode
+                        if (!bookToEdit.isbn) {
+                            $location.path('/list');
+                        }
+                        return;
+                    case 'LoginController':
+                        currentLocationService.setCurrentLocation('Login');
+                        //must not be already logged in
+                        const alreadyLoggedIn = loggedUserService.isLoggedIn()
+                        if (alreadyLoggedIn) {
+                            event.preventDefault();
+                            $location.path('/list')
+                        }
+                        return;
+                    default:
+                        currentLocationService.setCurrentLocation('Home');
+                        return;
+                }
+            });
+        }])
 
     .controller('StoreController', [
         '$scope',
@@ -287,11 +316,13 @@ angular.module('myApp', [
             };
 
         }])
+
     .component('backToListBtn', {
         template: `<a href="#!/list" type="button" class="btn btn-secondary mr-2">Torna alla lista</a>`,
         controller: function () {
         },
     })
+
     .component('errorModal', {
         template: `<div class="modal d-block" role="dialog" aria-labelledby="myModalLabel">
                         <div class="modal-dialog">
