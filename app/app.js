@@ -33,108 +33,260 @@ angular.module('myApp', [
     'myApp.detail',
     'myApp.editBook',
     'myApp.login',
-    'myApp.version'
+    'myApp.version',
 ])
+
     .config(['$locationProvider', '$routeProvider', function ($locationProvider, $routeProvider) {
         $locationProvider.hashPrefix('!');
-        $routeProvider.otherwise({redirectTo: '/login'});
+        $routeProvider.otherwise({redirectTo: '/list'});
     }])
-    .controller('StoreController', ['$scope', '$location', function ($scope) {
-        $scope.currentController = 'StoreController';
 
-        //------------------ breadcrumbs ------------------
+    .factory('currentLocationService', ['$rootScope', function ($rootScope) {
+        const service = {
+            currentLocation: 'Default',
+            getCurrentLocation: function () {
+                return this.currentLocation;
+            },
+            setCurrentLocation: function (newLocation) {
+                this.currentLocation = newLocation;
+                $rootScope.$broadcast('currentLocation:updated', newLocation);
+            },
+        }
+        $rootScope.$on("getCurrentLocation", service.getCurrentLocation);
+        $rootScope.$on("setCurrentLocation", service.setCurrentLocation);
+        return service;
+    }])
 
-        $scope.currentLocation = 'Elenco libri';
+    .factory('loggedUserService', ['$rootScope', function ($rootScope) {
+        const service = {
+            loggedUser: {
+                id: undefined,
+                username: undefined,
+                role: undefined,
+            },
+            getLoggedUser: function () {
+                return this.loggedUser;
+            },
+            setLoggedUser: function (newUser) {
+                this.loggedUser = newUser;
+                $rootScope.$broadcast('loggedUser:updated', newUser);
+            },
+            isLoggedIn: function () {
+                return !!(this.loggedUser && !!this.loggedUser.username);
+            },
+            isAdmin: function () {
+                return this.isLoggedIn() && this.loggedUser.role === 'admin';
+            },
+        }
+        $rootScope.$on("getLoggedUser", service.getLoggedUser);
+        $rootScope.$on("setLoggedUser", service.setLoggedUser);
+        $rootScope.$on("isLoggedIn", service.isLoggedIn);
+        $rootScope.$on("isAdmin", service.isAdmin);
+        return service;
+    }])
 
-        $scope.$on('$routeChangeStart', function ($event, next, current) {
-            if (next.$$route) {
-                const controller = next.$$route.controller;
-                switch (controller) {
-                    case 'ListController':
-                        return $scope.currentLocation = 'Elenco libri';
-                    case 'AddBookController':
-                        return $scope.currentLocation = 'Aggiunta libro';
-                    case 'DetailController':
-                        return $scope.currentLocation = 'Dettagli libro';
-                    case 'EditBookController':
-                        return $scope.currentLocation = 'Modifica libro';
-                    case 'LoginController':
-                        return $scope.currentLocation = 'Login';
-                    default:
-                        return 'Home';
-                }
+    .factory('errorModalService', ['$rootScope', function ($rootScope) {
+        const service = {
+            error: undefined,
+            getError: function () {
+                return this.error;
+            },
+            setError: function (newError) {
+                this.error = newError;
+                $rootScope.$broadcast('error:updated', newError);
+            },
+        }
+        $rootScope.$on("getError", service.getError);
+        $rootScope.$on("setError", service.setError);
+        return service;
+    }])
+
+
+    .factory('booksService', ['$rootScope', function ($rootScope) {
+        const service = {
+            allBooks: getDefaultBooks(35),
+            getAllBooks: function () {
+                return this.allBooks;
+            },
+            selectedBook: undefined,
+            getSelectedBook: function () {
+                return this.selectedBook;
+            },
+            setSelectedBook: function (newBook) {
+                this.selectedBook = newBook;
+                $rootScope.$broadcast('selectedBook:updated', newBook);
+            },
+            bookToEdit: undefined,
+            getBookToEdit: function () {
+                return this.bookToEdit;
+            },
+            setBookToEdit: function (id) {
+                const newBook = {...this.allBooks.find(b => b.id === id)}
+                this.bookToEdit = newBook;
+                $rootScope.$broadcast('bookToEdit:updated', newBook);
+            },
+            editBook: function (editedBook) {
+                const updatedAllBooks = [...this.allBooks].map(b => {
+                    if (b.id === editedBook.id) {
+                        return editedBook;
+                    }
+                    return b;
+                });
+                this.allBooks = updatedAllBooks;
+                this.selectedBook = editedBook;
+                $rootScope.$broadcast('selectedBook:updated', editedBook);
+                $rootScope.$broadcast('allBooks:updated', updatedAllBooks);
+            },
+            deleteBook: function (id) {
+                const updatedAllBooks = this.allBooks.filter(b => {
+                    return b.id !== id
+                });
+                this.allBooks = updatedAllBooks;
+                $rootScope.$broadcast('allBooks:updated', updatedAllBooks);
+            }
+        }
+        $rootScope.$on("getAllBooks", service.getAllBooks);
+        $rootScope.$on("getSelectedBook", service.getSelectedBook);
+        $rootScope.$on("setSelectedBook", service.setSelectedBook);
+        $rootScope.$on("getBookToEdit", service.getBookToEdit);
+        $rootScope.$on("setBookToEdit", service.setBookToEdit);
+        $rootScope.$on("editBook", service.editBook);
+        $rootScope.$on("deleteBook", service.deleteBook);
+        return service;
+    }])
+
+
+    .run(['$rootScope', '$location', 'loggedUserService', 'currentLocationService', function ($rootScope, $location, loggedUserService, currentLocationService) {
+        $rootScope.$on('$routeChangeStart', function (event, next) {
+            const currentController = next.$$route.controller;
+            const isAdmin = loggedUserService.isAdmin();
+            switch (currentController) {
+                case 'ListController':
+                    currentLocationService.setCurrentLocation('Elenco libri');
+                    return;
+                case 'AddBookController':
+                    currentLocationService.setCurrentLocation('Aggiunta libro');
+                    //requires to be admin
+                    if (!isAdmin) {
+                        $location.path('/list')
+                    }
+                    return;
+                case 'DetailController':
+                    currentLocationService.setCurrentLocation('Dettagli libro');
+                    return;
+                case 'EditBookController':
+                    currentLocationService.setCurrentLocation('Modifica libro');
+                    //requires to be admin
+                    if (!isAdmin) {
+                        $location.path('/list')
+                    }
+                    return;
+                case 'LoginController':
+                    currentLocationService.setCurrentLocation('Login');
+                    //must not be already logged in
+                    const alreadyLoggedIn = loggedUserService.isLoggedIn()
+                    if (alreadyLoggedIn) {
+                        event.preventDefault();
+                        $location.path('/list')
+                    }
+                    return;
+                default:
+                    currentLocationService.setCurrentLocation('Home');
+                    return;
             }
         });
-
-        //------------------ error modal ------------------
-
-        $scope.currentError = undefined;
-
-        $scope.showErrorModal = function (errorMsg) {
-            $scope.currentError = errorMsg;
-        }
-
-        $scope.closeErrorModal = function () {
-            $scope.currentError = undefined;
-        }
-
-        //------------------ logged user ------------------
-
-        $scope.loggedUser = undefined;
-
-        $scope.setLoggedUser = function (newUser) {
-            $scope.loggedUser = newUser;
-        }
-
-        $scope.unsetLoggedUser = function () {
-            $scope.loggedUser = undefined;
-        }
-
-        $scope.isAdmin = function () {
-            return !!$scope.loggedUser && $scope.loggedUser.role === 'admin'
-        }
-
-        //------------------ books ------------------
-
-        $scope.allBooks = getDefaultBooks(35);
-
-        $scope.selectedBook = undefined;
-
-        $scope.setSelectedBook = function (newBook) {
-            $scope.selectedBook = newBook;
-        }
-
-        $scope.unsetSelectedBook = function () {
-            $scope.selectedBook = undefined;
-        }
-
-        $scope.bookToEdit = undefined;
-
-        $scope.setBookToEdit = function (id) {
-            $scope.bookToEdit = {...$scope.allBooks.find(b => b.id === id)};
-        }
-
-        $scope.unsetBookToEdit = function () {
-            $scope.bookToEdit = undefined;
-        }
-
-        $scope.editBook = function (editedBook) {
-            $scope.allBooks = [...$scope.allBooks].map(b => {
-                if (b.id === editedBook.id) {
-                    return editedBook;
-                }
-                return b;
-            })
-            $scope.selectedBook = editedBook;
-        }
-
-        $scope.deleteBook = function (id) {
-            $scope.allBooks = $scope.allBooks.filter(b => {
-                return b.id !== id
-            })
-        };
-
     }])
+
+    .controller('StoreController', [
+        '$scope',
+        'loggedUserService',
+        'currentLocationService',
+        'errorModalService',
+        'booksService',
+        function (
+            $scope,
+            loggedUserService,
+            currentLocationService,
+            errorModalService,
+            booksService
+        ) {
+            //------------------ breadcrumbs ------------------
+            $scope.currentLocation = currentLocationService.getCurrentLocation();
+
+            $scope.$on('currentLocation:updated', function (event, data) {
+                $scope.currentLocation = data;
+            });
+
+            //------------------ error modal ------------------
+            $scope.currentError = errorModalService.getError();
+
+            $scope.$on('error:updated', function (event, data) {
+                $scope.currentError = data;
+            });
+
+            $scope.showErrorModal = function (errorMsg) {
+                errorModalService.setError(errorMsg);
+            }
+
+            $scope.closeErrorModal = function () {
+                errorModalService.setError(undefined);
+            }
+
+            //------------------ logged user ------------------
+            $scope.loggedUser = loggedUserService.getLoggedUser();
+
+            $scope.$on('loggedUser:updated', function (event, data) {
+                $scope.loggedUser = data;
+            });
+
+            $scope.setLoggedUser = function (newUser) {
+                loggedUserService.setLoggedUser(newUser);
+            }
+
+            $scope.unsetLoggedUser = function () {
+                loggedUserService.setLoggedUser(undefined);
+            }
+
+            $scope.isAdmin = function () {
+                return loggedUserService.isAdmin();
+            }
+
+            //------------------ books ------------------
+            $scope.allBooks = booksService.getAllBooks();
+
+            $scope.$on('allBooks:updated', function (event, data) {
+                $scope.allBooks = data;
+            });
+
+            $scope.selectedBook = booksService.getSelectedBook();
+
+            $scope.$on('selectedBook:updated', function (event, data) {
+                $scope.selectedBook = data;
+            });
+
+            $scope.setSelectedBook = function (newBook) {
+                booksService.setSelectedBook(newBook);
+            }
+
+            $scope.bookToEdit = booksService.getBookToEdit();
+
+            $scope.$on('bookToEdit:updated', function (event, data) {
+                $scope.bookToEdit = data;
+            });
+
+            $scope.setBookToEdit = function (id) {
+                booksService.setBookToEdit(id);
+            }
+
+            $scope.editBook = function (editedBook) {
+                booksService.editBook(editedBook);
+            }
+
+            $scope.deleteBook = function (id) {
+                booksService.deleteBook(id);
+            };
+
+        }])
     .component('backToListBtn', {
         template: `<a href="#!/list" type="button" class="btn btn-secondary mr-2">Torna alla lista</a>`,
         controller: function () {

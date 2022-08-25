@@ -9,8 +9,6 @@ angular.module('myApp.login', ['ngRoute'])
     }])
     .controller('LoginController', ['$scope', '$location', function ($scope, $location) {
 
-        $scope.currentController = 'LoginController';
-
         $scope.savedUsers = [{
             id: 'userId',
             username: 'admin',

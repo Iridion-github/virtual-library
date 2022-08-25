@@ -8,7 +8,6 @@ angular.module('myApp.list', ['ngRoute'])
         });
     }])
     .controller('ListController', ['$scope', function ($scope) {
-        $scope.currentController = 'ListController';
         $scope.isAdmin = $scope.$parent.isAdmin;
         $scope.allBooks = $scope.$parent.allBooks;
         $scope.currentPage = 1;

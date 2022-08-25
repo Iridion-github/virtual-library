@@ -9,8 +9,6 @@ angular.module('myApp.addBook', ['ngRoute'])
     }])
     .controller('AddBookController', ['$scope', '$location', function ($scope, $location) {
 
-        $scope.currentController = 'AddBookController';
-
         $scope.isDisabledAddBook = true;
 
         $scope.bookToAdd = {

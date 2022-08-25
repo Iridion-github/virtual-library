@@ -9,8 +9,6 @@ angular.module('myApp.editBook', ['ngRoute'])
     }])
     .controller('EditBookController', ['$scope', '$location', function ($scope, $location) {
 
-        $scope.currentController = 'EditBookController';
-
         $scope.bookToEdit = $scope.$parent.bookToEdit;
 
         $scope.parentAllBooks = $scope.$parent.allBooks;

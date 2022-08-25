@@ -9,8 +9,6 @@ angular.module('myApp.detail', ['ngRoute'])
     }])
     .controller('DetailController', ['$scope', '$location', function ($scope, $location) {
 
-        $scope.currentController = 'DetailController';
-
         $scope.selectedBook = $scope.$parent.selectedBook;
 
         $scope.bookToDelete = undefined;
