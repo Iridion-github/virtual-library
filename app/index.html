@@ -10,7 +10,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Virtual Library</title>
+    <title>Libreria Virtuale</title>
     <link rel="shortcut icon" href="public/favicon.ico" type="image/x-icon">
     <link rel="icon" href="public/favicon.ico" type="image/x-icon">
     <meta name="description" content="">
@@ -55,23 +55,9 @@
 
 <div ng-view></div>
 
-<div ng-cloak ng-if="currentError && currentError.length" class="modal d-block" role="dialog"
-     aria-labelledby="myModalLabel">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 id="myModalLabel">Errore</h5>
-                <button type="button" class="close" data-dismiss="modal" ng-click="closeErrorModal()">×</button>
-            </div>
-            <div class="modal-body">
-                <p>{{ currentError }}</p>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" data-dismiss="modal" ng-click="closeErrorModal()">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
+<error-modal ng-cloak ng-if="currentError && currentError.length" current-error={{currentError}}
+             close-error-modal="closeErrorModal()"/>
+
 
 <script src="lib/angular/angular.js"></script>
 <script src="lib/angular-route/angular-route.js"></script>

@@ -1,12 +1,14 @@
 'use strict';
 
+const letters = Array.from(Array(26)).map((e, i) => i + 65).map((x) => String.fromCharCode(x));
+
 function getDefaultBooks(amount) {
     const result = [];
     for (let x = 0; x < amount; x++) {
         result.push({
             id: x.toString(),
-            isbn: x.toString(),
-            title: `Libro default ${x + 1}`,
+            isbn: `${letters[x]}${letters[x]}${letters[x]}${letters[x]}${letters[x]}${letters[x]}-${x}`,
+            title: `Titolo libro default ${x + 1}`,
             author: `Autore libro default ${x + 1}`,
             description: `Descrizione libro default ${x + 1}`,
             coverImg: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbmpkg-KZ4ezscypPhu3nnrNHwP4WYlTJEkQ&usqp=CAU',
@@ -94,7 +96,7 @@ angular.module('myApp', [
 
         //------------------ books ------------------
 
-        $scope.allBooks = getDefaultBooks(15);
+        $scope.allBooks = getDefaultBooks(35);
 
         $scope.selectedBook = undefined;
 
@@ -135,7 +137,30 @@ angular.module('myApp', [
     }])
     .component('backToListBtn', {
         template: `<a href="#!/list" type="button" class="btn btn-secondary mr-2">Torna alla lista</a>`,
-        controller: function BackToListBtnController() {
-            //no need for now;
-        }
-    });
+        controller: function () {
+        },
+    })
+    .component('errorModal', {
+        template: `<div class="modal d-block" role="dialog" aria-labelledby="myModalLabel">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 id="myModalLabel">Errore</h5>
+                                    <button type="button" class="close" data-dismiss="modal" ng-click="$ctrl.closeErrorModal()">×</button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>{{ $ctrl.currentError }}</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button class="btn btn-secondary" data-dismiss="modal" ng-click="$ctrl.closeErrorModal()">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`,
+        bindings: {
+            currentError: '@',
+            closeErrorModal: '&',
+        },
+        controller: function () {
+        },
+    })
