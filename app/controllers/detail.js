@@ -3,7 +3,7 @@
 angular.module('myApp.detail', ['ngRoute'])
     .config(['$routeProvider', function ($routeProvider) {
         $routeProvider.when('/detail', {
-            templateUrl: 'partials/detail.html',
+            templateUrl: 'pages/detail.html',
             controller: 'DetailController',
         });
     }])

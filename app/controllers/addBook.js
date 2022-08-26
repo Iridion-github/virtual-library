@@ -3,7 +3,7 @@
 angular.module('myApp.addBook', ['ngRoute'])
     .config(['$routeProvider', function ($routeProvider) {
         $routeProvider.when('/addBook', {
-            templateUrl: 'partials/addBook.html',
+            templateUrl: 'pages/addBook.html',
             controller: 'AddBookController',
         });
     }])

@@ -3,7 +3,7 @@
 angular.module('myApp.wordle', ['ngRoute'])
     .config(['$routeProvider', function ($routeProvider) {
         $routeProvider.when('/wordle', {
-            templateUrl: 'partials/wordle.html',
+            templateUrl: 'pages/wordle.html',
             controller: 'WordleController',
         });
     }])
