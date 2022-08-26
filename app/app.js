@@ -196,7 +196,9 @@ angular.module('myApp', [
             });
 
             $scope.submitWord = function (word) {
-                wordleService.compareWords(word);
+                if (!$scope.isDisabledSubmitWord(word)) {
+                    wordleService.compareWords(word);
+                }
             };
 
             $scope.wordIsNonexistent = wordleService.getWordIsNonexistent();

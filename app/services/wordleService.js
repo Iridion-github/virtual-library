@@ -54,7 +54,7 @@ angular.module('myApp').factory('wordleService', ['$rootScope', '$http', functio
             $rootScope.$broadcast('excludedLetters:updated', updatedLetters);
         }
         ,
-        currentWord: '',
+        currentWord: { value: '' },
         getCurrentWord: function () {
             return this.currentWord;
         },
@@ -77,7 +77,7 @@ angular.module('myApp').factory('wordleService', ['$rootScope', '$http', functio
             this.setYellowLetters([]);
             this.setGreenLetters([]);
             this.setExcludedLetters([]);
-            this.setCurrentWord('');
+            this.setCurrentWord({value: ''});
             this.generateTargetWord(this);
         },
         gameMessage: undefined,
@@ -97,7 +97,7 @@ angular.module('myApp').factory('wordleService', ['$rootScope', '$http', functio
             this.setIsPlayable(false);
         },
         compareWords: function (currentWord) {
-            this.setCurrentWord('');
+            console.log('compareWords - this.currentWord:', this.currentWord);
             const currentLetters = currentWord.split('');
             const targetLetters = this.targetWord.split('');
             for (let x = 0; x <= 4; x++) {
@@ -130,7 +130,7 @@ angular.module('myApp').factory('wordleService', ['$rootScope', '$http', functio
                     $rootScope.$broadcast('excludedLetters:updated', excludedLettersUpdated);
                 }
             }
-            if (currentWord === this.targetWord) {
+            if (currentWord === this.targetWord.value) {
                 this.handleVictory();
                 return;
             }
@@ -142,6 +142,7 @@ angular.module('myApp').factory('wordleService', ['$rootScope', '$http', functio
                     this.handleDefeat();
                 }
             }
+            this.setCurrentWord({value: ''});
         },
         wordIsNonexistent: true,
         getWordIsNonexistent: function () {

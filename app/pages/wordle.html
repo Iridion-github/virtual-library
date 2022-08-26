@@ -1,6 +1,8 @@
 <div ng-controller="WordleController" style="display: flex; flex-direction: column; padding: 20px;">
     <div style="display: flex; align-items: center">
         <back-to-list-btn/>
+        <button class="btn btn-danger" ng-click="resetGame()"> Reset
+        </button>
     </div>
     <div class="col-md-4 offset-md-4 mb-5">
         <div ng-repeat="insertedWord in insertedWords">
@@ -77,20 +79,19 @@
             <div ng-class="" class="mr-2" style="height:50px; width: 50px; border: 1px solid black;"></div>
         </div>
     </div>
-    <div class="col-md-4 offset-md-4 mt-5" style="display: flex; flex-direction: row;">
-        <div class="col-md-2 p-0 m-0">
-            <button class="btn btn-danger btn-block" ng-click="resetGame()"> Reset
-            </button>
+    <form ng-submit="submitWord(currentWord.value.toLowerCase())">
+        <div class="col-md-4 offset-md-4 mt-5" style="display: flex; flex-direction: row;">
+            <div class="col-md-9 p-0 m-0">
+                <input type="text" class="form-control" ng-model="currentWord.value">
+            </div>
+            <div class="col-md-3 p-0 m-0">
+                <button type="submit" class="btn btn-success btn-block"
+                        ng-click="submitWord(currentWord.value.toLowerCase());"
+                        data-ng-disabled="isDisabledSubmitWord(currentWord.value)"> Invio
+                </button>
+            </div>
         </div>
-        <div class="col-md-7 p-0 m-0">
-            <input type="text" class="form-control" placeholder="" ng-model="currentWord" ng-required="true">
-        </div>
-        <div class="col-md-3 p-0 m-0">
-            <button class="btn btn-success btn-block" ng-click="submitWord(currentWord.toLowerCase()); currentWord=''"
-                    data-ng-disabled="isDisabledSubmitWord(currentWord)"> Invio
-            </button>
-        </div>
-    </div>
+    </form>
     <div class="mt-5"
          style="display: flex; flex-direction: row; justify-content: center">
         <div ng-repeat="letter in alphabet">
