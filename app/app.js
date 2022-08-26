@@ -8,7 +8,6 @@ angular.module('myApp', [
     'myApp.detail',
     'myApp.editBook',
     'myApp.login',
-    'myApp.version',
     'myApp.wordle',
 ])
     .config(['$locationProvider', '$routeProvider', function ($locationProvider, $routeProvider) {
@@ -29,7 +28,7 @@ angular.module('myApp', [
             booksService
         ) {
             $rootScope.$on('$routeChangeStart', function (event, next) {
-                const currentController = next.$$route.controller;
+                const currentController = !next.$$route ? 'Elenco libri' : next.$$route.controller;
                 const isAdmin = loggedUserService.isAdmin();
                 const selectedBook = booksService.getSelectedBook();
                 const bookToEdit = booksService.getBookToEdit();
@@ -75,7 +74,7 @@ angular.module('myApp', [
                         currentLocationService.setCurrentLocation('Wordle');
                         return;
                     default:
-                        currentLocationService.setCurrentLocation('Home');
+                        currentLocationService.setCurrentLocation('Elenco libri');
                         return;
                 }
             });
@@ -200,11 +199,24 @@ angular.module('myApp', [
                 wordleService.compareWords(word);
             };
 
+            $scope.wordIsNonexistent = wordleService.getWordIsNonexistent();
+            $scope.$on('wordIsNonexistent:updated', function (event, data) {
+                $scope.wordIsNonexistent = data;
+            });
+
+            $scope.lastCheckedWord = wordleService.getLastCheckedWord();
+            $scope.$on('lastCheckedWord:updated', function (event, data) {
+                $scope.lastCheckedWord = data;
+            });
+
+            $scope.isWordValid = wordleService.getIsWordValid();
+            $scope.$on('isWordValid:updated', function (event, data) {
+                $scope.isWordValid = data;
+            });
+
             $scope.isDisabledSubmitWord = function (word) {
-                const wrongLength = word.length !== 5;
-                const gameOver = !$scope.isPlayable;
-                const isDuplicate = $scope.insertedWords.includes(word);
-                return wrongLength || gameOver || isDuplicate;
+                wordleService.checkIsWordValid(word, $scope.isPlayable);
+                return !$scope.isWordValid;
             }
 
             $scope.insertedWords = wordleService.getInsertedWords();

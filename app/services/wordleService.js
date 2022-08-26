@@ -79,7 +79,6 @@ angular.module('myApp').factory('wordleService', ['$rootScope', '$http', functio
             this.setExcludedLetters([]);
             this.setCurrentWord('');
             this.generateTargetWord(this);
-            //this.generateTargetWord();
         },
         gameMessage: undefined,
         getGameMessage: function () {
@@ -90,7 +89,6 @@ angular.module('myApp').factory('wordleService', ['$rootScope', '$http', functio
             $rootScope.$broadcast('gameMessage:updated', msg);
         },
         handleVictory: function () {
-            console.log('handleVictory');
             this.setGameMessage(`Congratulazioni, hai vinto! \nLa parola era: ${this.targetWord}`);
             this.setIsPlayable(false);
         },
@@ -144,7 +142,49 @@ angular.module('myApp').factory('wordleService', ['$rootScope', '$http', functio
                     this.handleDefeat();
                 }
             }
-        }
+        },
+        wordIsNonexistent: true,
+        getWordIsNonexistent: function () {
+            return this.wordIsNonexistent;
+        },
+        setWordIsNonexistent: function (value) {
+            this.wordIsNonexistent = value;
+            $rootScope.$broadcast('wordIsNonexistent:updated', value);
+        },
+        lastCheckedWord: '',
+        getLastCheckedWord: function () {
+            return this.lastCheckedWord;
+        },
+        setLastCheckedWord: function (value) {
+            this.lastCheckedWord = value;
+            $rootScope.$broadcast('lastCheckedWord:updated', value);
+        },
+        isWordValid: false,
+        getIsWordValid: function () {
+            return this.isWordValid;
+        },
+        setIsWordValid: function (value) {
+            this.isWordValid = value;
+            $rootScope.$broadcast('isWordValid:updated', value);
+        },
+        checkIsWordValid: function (word) {
+            if (!word) return this.setIsWordValid(false);
+            if (word.length !== 5) return this.setIsWordValid(false);
+            if (!this.isPlayable) return this.setIsWordValid(false);
+            if (this.insertedWords.includes(word)) return this.setIsWordValid(false);
+            if (word.length === 5 && this.lastCheckedWord !== word && this.lastCheckedWord !== word) {
+                this.setLastCheckedWord(word);
+                const originalThis = this;
+                $http({
+                    method: 'GET',
+                    url: `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
+                }).then(function successCallback(response) {
+                    originalThis.setIsWordValid(true);
+                }, function errorCallback(response) {
+                    originalThis.setIsWordValid(false);
+                });
+            }
+        },
     }
     $rootScope.$on("getAlphabet", service.getAlphabet);
     $rootScope.$on("getTargetWord", service.getTargetWord);
@@ -165,5 +205,11 @@ angular.module('myApp').factory('wordleService', ['$rootScope', '$http', functio
     $rootScope.$on("getGameMessage", service.getGameMessage);
     $rootScope.$on("setGameMessage", service.setGameMessage);
     $rootScope.$on("resetGame", service.resetGame);
+    $rootScope.$on("getWordIsNonexistent", service.getWordIsNonexistent);
+    $rootScope.$on("getLastCheckedWord", service.getLastCheckedWord);
+    $rootScope.$on("setLastCheckedWord", service.setLastCheckedWord);
+    $rootScope.$on("getIsWordValid", service.getIsWordValid);
+    $rootScope.$on("setIsWordValid", service.setIsWordValid);
+    $rootScope.$on("checkIsWordValid", service.isWordValid);
     return service;
 }])
