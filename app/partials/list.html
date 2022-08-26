@@ -1,12 +1,16 @@
 <div ng-controller="ListController" style="display: flex; flex-direction: column; padding: 20px;">
     <div class="col-md-8 offset-md-2 pl-0 pr-0 pt-2 pb-4" style="display: flex; justify-content: end;">
-        <a ng-if="isAdmin()" href="#!/addBook" class="btn btn-primary">Aggiungi un libro <i class="fa-solid fa-plus"></i></a>
+        <a ng-if="isAdmin()" href="#!/addBook" class="btn btn-primary">Aggiungi un libro <i
+                class="fa-solid fa-plus"></i></a>
     </div>
-    <div class="col-md-8 offset-md-2 p-2" style="display: flex; flex: 1; justify-content: space-between; background-color: #444444; color: white">
-        <button class="btn btn-info btn-sm" data-ng-disabled="disabledPrevPage" ng-click="goPrevPage()"> <i class="fa-solid fa-angles-left"></i> Indietro
+    <div class="col-md-8 offset-md-2 p-2"
+         style="display: flex; flex: 1; justify-content: space-between; background-color: #444444; color: white">
+        <button class="btn btn-info btn-sm" data-ng-disabled="disabledPrevPage" ng-click="goPrevPage()"><i
+                class="fa-solid fa-angles-left"></i> Indietro
         </button>
         <div><small>Pagina: {{ currentPage }} di {{ totalPages }}</small></div>
-        <button class="btn btn-info btn-sm" data-ng-disabled="disabledNextPage" ng-click="goNextPage()"> Avanti <i class="fa-solid fa-angles-right"></i></button>
+        <button class="btn btn-info btn-sm" data-ng-disabled="disabledNextPage" ng-click="goNextPage()"> Avanti <i
+                class="fa-solid fa-angles-right"></i></button>
     </div>
     <div class="col-md-8 offset-md-2 p-0">
         <table class="table table-striped table-dark w-100">
@@ -24,10 +28,15 @@
                 <td>{{ book.isbn }}</td>
                 <td>{{ book.title }}</td>
                 <td style="display: flex; justify-content: end">
-                    <a href="#!/detail" class="btn btn-primary" ng-click="onSelectBook(book.id)">Dettagli <i class="fa-solid fa-circle-info"></i></a>
+                    <a href="#!/detail" class="btn btn-primary" ng-click="onSelectBook(book.id)">Dettagli <i
+                            class="fa-solid fa-circle-info"></i></a>
                 </td>
             </tr>
             </tbody>
         </table>
+        <div class="col-md-12 p-0"
+             style="display: flex; flex: 1; justify-content: flex-end; align-items: center; color: white">
+            <a href="#!/wordle" class="btn btn-success">Gioca a Wordle <i class="fa-solid fa-gamepad"></i></a>
+        </div>
     </div>
 </div>

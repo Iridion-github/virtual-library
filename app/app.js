@@ -1,8 +1,10 @@
 'use strict';
 
+const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+const charactersLess = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
 function generateIsbn(length) {
     let result = '';
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     for (let i = 0; i < length; i++) {
         result += characters.charAt(Math.floor(Math.random() *
             characters.length));
@@ -34,6 +36,10 @@ function getPaginatedBooks(allBooks, booksPerPage) {
     return result;
 }
 
+function generateRandomWord() {
+    return 'right';
+}
+
 angular.module('myApp', [
     'ngRoute',
     'swxLocalStorage',
@@ -43,6 +49,7 @@ angular.module('myApp', [
     'myApp.editBook',
     'myApp.login',
     'myApp.version',
+    'myApp.wordle',
 ])
 
     .config(['$locationProvider', '$routeProvider', function ($locationProvider, $routeProvider) {
@@ -106,7 +113,7 @@ angular.module('myApp', [
         return service;
     }])
 
-    .factory('errorModalService', ['$rootScope', function ($rootScope) {
+    .factory('customModalService', ['$rootScope', function ($rootScope) {
         const service = {
             error: undefined,
             getError: function () {
@@ -175,6 +182,164 @@ angular.module('myApp', [
         return service;
     }])
 
+    .factory('wordleService', ['$rootScope', '$localStorage', function ($rootScope, $localStorage) {
+        const service = {
+            alphabet: charactersLess,
+            getAlphabet: function () {
+                return this.alphabet;
+            },
+            targetWord: generateRandomWord(),
+            getTargetWord: function () {
+                return this.targetWord;
+            },
+            setTargetWord: function (word) {
+                this.targetWord = word;
+                $rootScope.$broadcast('targetWord:updated', word);
+            },
+            insertedWords: [],
+            getInsertedWords: function () {
+                return this.insertedWords;
+            }, setInsertedWords: function (updatedArr) {
+                this.insertedWords = updatedArr;
+                $rootScope.$broadcast('insertedWords:updated', updatedArr);
+            },
+            greenLetters: [],
+            getGreenLetters: function () {
+                return this.greenLetters;
+            },
+            setGreenLetters: function (updatedLetters) {
+                this.greenLetters = updatedLetters;
+                $rootScope.$broadcast('greenLetters:updated', updatedLetters);
+            },
+            yellowLetters: [],
+            getYellowLetters: function () {
+                return this.yellowLetters;
+            },
+            setYellowLetters: function (updatedLetters) {
+                this.yellowLetters = updatedLetters;
+                $rootScope.$broadcast('yellowLetters:updated', updatedLetters);
+            },
+            excludedLetters: [],
+            getExcludedLetters: function () {
+                return this.excludedLetters;
+            },
+            setExcludedLetters: function (updatedLetters) {
+                this.excludedLetters = updatedLetters;
+                $rootScope.$broadcast('excludedLetters:updated', updatedLetters);
+            }
+            ,
+            currentWord: '',
+            getCurrentWord: function () {
+                return this.currentWord;
+            },
+            setCurrentWord: function (word) {
+                this.currentWord = word;
+                $rootScope.$broadcast('currentWord:updated', word);
+            },
+            isPlayable: true,
+            getIsPlayable: function () {
+                return this.isPlayable;
+            },
+            setIsPlayable: function (value) {
+                this.isPlayable = value;
+                $rootScope.$broadcast('isPlayable:updated', value);
+            },
+            resetGame: function () {
+                this.setGameMessage(undefined);
+                this.setIsPlayable(true);
+                this.setInsertedWords([]);
+                this.setYellowLetters([]);
+                this.setGreenLetters([]);
+                this.setExcludedLetters([]);
+                this.setCurrentWord('');
+                this.setTargetWord(generateRandomWord());
+            },
+            gameMessage: undefined,
+            getGameMessage: function () {
+                return this.message;
+            },
+            setGameMessage: function (msg) {
+                this.gameMessage = msg;
+                $rootScope.$broadcast('gameMessage:updated', msg);
+            },
+            handleVictory: function () {
+                console.log('handleVictory');
+                this.setGameMessage(`Congratulazioni, hai vinto! \nLa parola era: ${this.targetWord}`);
+                this.setIsPlayable(false);
+            },
+            handleDefeat: function () {
+                this.setGameMessage(`Peccato, hai perso. \nLa parola era: ${this.targetWord}`);
+                this.setIsPlayable(false);
+            },
+            compareWords: function (currentWord) {
+                this.setCurrentWord('');
+                const currentLetters = currentWord.split('');
+                const targetLetters = this.targetWord.split('');
+                for (let x = 0; x <= 4; x++) {
+                    const currLetter = currentLetters[x];
+                    const targLetter = targetLetters[x];
+                    //green letters logic
+                    if (currLetter === targLetter && !this.greenLetters.includes(currLetter)) {
+                        const greenLetterObj = {
+                            index: x,
+                            value: currLetter,
+                        }
+                        const greenLettersUpdated = [...this.greenLetters, greenLetterObj];
+                        this.setGreenLetters(greenLettersUpdated);
+                        $rootScope.$broadcast('greenLetters:updated', greenLettersUpdated);
+                    }
+                    //yellow letters logic
+                    if (currLetter !== targLetter && this.targetWord.includes(currLetter) && !this.yellowLetters.includes(currLetter)) {
+                        const yellowLetterObj = {
+                            index: x,
+                            value: currLetter,
+                        }
+                        const yellowLettersUpdated = [...this.yellowLetters, yellowLetterObj];
+                        this.setYellowLetters(yellowLettersUpdated);
+                        $rootScope.$broadcast('yellowLetters:updated', yellowLettersUpdated);
+                    }
+                    //red letters logic
+                    if (currLetter !== targLetter && !this.targetWord.includes(currLetter) && !this.excludedLetters.includes(currLetter)) {
+                        const excludedLettersUpdated = [...this.excludedLetters, currLetter];
+                        this.setExcludedLetters(excludedLettersUpdated);
+                        $rootScope.$broadcast('excludedLetters:updated', excludedLettersUpdated);
+                    }
+                }
+                if (currentWord === this.targetWord) {
+                    this.handleVictory();
+                    return;
+                }
+                const insertedWordsUpdated = [...this.insertedWords, currentWord];
+                this.insertedWords = insertedWordsUpdated;
+                $rootScope.$broadcast('insertedWords:updated', insertedWordsUpdated);
+                if (insertedWordsUpdated.length > 5) {
+                    if (this.targetWord !== currentWord) {
+                        this.handleDefeat();
+                    }
+                }
+            }
+        }
+        $rootScope.$on("getAlphabet", service.getAlphabet);
+        $rootScope.$on("getTargetWord", service.getTargetWord);
+        $rootScope.$on("setTargetWord", service.setTargetWord);
+        $rootScope.$on("getCurrentWord", service.getCurrentWord);
+        $rootScope.$on("setCurrentWord", service.setCurrentWord);
+        $rootScope.$on("getGreenLetters", service.getGreenLetters);
+        $rootScope.$on("setGreenLetters", service.setGreenLetters);
+        $rootScope.$on("getYellowLetters", service.getYellowLetters);
+        $rootScope.$on("setYellowLetters", service.setYellowLetters);
+        $rootScope.$on("getExcludedLetters", service.getExcludedLetters);
+        $rootScope.$on("setExcludedLetters", service.setExcludedLetters);
+        $rootScope.$on("getInsertedWords", service.getInsertedWords);
+        $rootScope.$on("setInsertedWords", service.setInsertedWords);
+        $rootScope.$on("compareWords", service.compareWords);
+        $rootScope.$on("getIsPlayable", service.getIsPlayable);
+        $rootScope.$on("setIsPlayable", service.setIsPlayable);
+        $rootScope.$on("getGameMessage", service.getGameMessage);
+        $rootScope.$on("setGameMessage", service.setGameMessage);
+        $rootScope.$on("resetGame", service.resetGame);
+        return service;
+    }])
 
     .run([
         '$rootScope',
@@ -232,6 +397,9 @@ angular.module('myApp', [
                             $location.path('/list')
                         }
                         return;
+                    case 'WordleController':
+                        currentLocationService.setCurrentLocation('Wordle');
+                        return;
                     default:
                         currentLocationService.setCurrentLocation('Home');
                         return;
@@ -243,14 +411,16 @@ angular.module('myApp', [
         '$scope',
         'loggedUserService',
         'currentLocationService',
-        'errorModalService',
+        'customModalService',
         'booksService',
+        'wordleService',
         function (
             $scope,
             loggedUserService,
             currentLocationService,
-            errorModalService,
-            booksService
+            customModalService,
+            booksService,
+            wordleService
         ) {
             //------------------ breadcrumbs ------------------
             $scope.currentLocation = currentLocationService.getCurrentLocation();
@@ -260,18 +430,18 @@ angular.module('myApp', [
             });
 
             //------------------ error modal ------------------
-            $scope.currentError = errorModalService.getError();
+            $scope.currentError = customModalService.getError();
 
             $scope.$on('error:updated', function (event, data) {
                 $scope.currentError = data;
             });
 
-            $scope.showErrorModal = function (errorMsg) {
-                errorModalService.setError(errorMsg);
+            $scope.showCustomModal = function (errorMsg) {
+                customModalService.setError(errorMsg);
             }
 
-            $scope.closeErrorModal = function () {
-                errorModalService.setError(undefined);
+            $scope.closeCustomModal = function () {
+                customModalService.setError(undefined);
             }
 
             //------------------ logged user ------------------
@@ -328,6 +498,81 @@ angular.module('myApp', [
                 booksService.deleteBook(id);
             };
 
+            //------------------ wordle ------------------
+            $scope.targetWord = wordleService.getTargetWord();
+
+            $scope.$on('targetWord:updated', function (event, data) {
+                $scope.targetWord = data;
+            });
+
+            $scope.currentWord = wordleService.getCurrentWord();
+
+            $scope.$on('currentWord:updated', function (event, data) {
+                console.log('set currentWord to:', data);
+                $scope.currentWord = data;
+            });
+
+            $scope.alphabet = wordleService.getAlphabet();
+
+            $scope.greenLetters = wordleService.getGreenLetters();
+
+            $scope.$on('greenLetters:updated', function (event, data) {
+                $scope.greenLetters = data;
+            });
+
+            $scope.yellowLetters = wordleService.getYellowLetters();
+
+            $scope.$on('yellowLetters:updated', function (event, data) {
+                $scope.yellowLetters = data;
+            });
+
+            $scope.excludedLetters = wordleService.getExcludedLetters();
+
+            $scope.$on('excludedLetters:updated', function (event, data) {
+                $scope.excludedLetters = data;
+            });
+
+            $scope.submitWord = function (word) {
+                wordleService.compareWords(word);
+            };
+
+            $scope.isDisabledSubmitWord = function (word) {
+                const wrongLength = word.length !== 5;
+                const gameOver = !$scope.isPlayable;
+                const isDuplicate = $scope.insertedWords.includes(word);
+                return wrongLength || gameOver || isDuplicate;
+            }
+
+            $scope.insertedWords = wordleService.getInsertedWords();
+
+            $scope.$on('insertedWords:updated', function (event, data) {
+                $scope.insertedWords = data;
+            });
+
+            $scope.getLetterBackgroundColor = function (letter, index) {
+                const isGreen = !!$scope.greenLetters.find(el => el.value === letter.toLowerCase() && el.index === index);
+                const isYellow = !!$scope.yellowLetters.find(el => el.value === letter.toLowerCase() && el.index === index);
+                if (isGreen) return 'bg-success';
+                if (isYellow) return 'bg-warning';
+                return '';
+            }
+
+            $scope.gameMessage = wordleService.getGameMessage();
+
+            $scope.$on('gameMessage:updated', function (event, data) {
+                $scope.gameMessage = data;
+            });
+
+            $scope.resetGame = function () {
+                wordleService.resetGame();
+            }
+
+            $scope.isPlayable = wordleService.getIsPlayable();
+
+            $scope.$on('isPlayable:updated', function (event, data) {
+                $scope.isPlayable = data;
+            });
+
         }])
 
     .component('backToListBtn', {
@@ -336,26 +581,28 @@ angular.module('myApp', [
         },
     })
 
-    .component('errorModal', {
+    .component('customModal', {
         template: `<div class="modal d-block" role="dialog" aria-labelledby="myModalLabel">
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 id="myModalLabel">Errore</h5>
-                                    <button type="button" class="close" data-dismiss="modal" ng-click="$ctrl.closeErrorModal()">×</button>
+                                    <h5 id="myModalLabel">{{ $ctrl.modalTitle }}</h5>
+                                    <button type="button" class="close" data-dismiss="modal" ng-click="$ctrl.closeCustomModal()">×</button>
                                 </div>
                                 <div class="modal-body">
-                                    <p>{{ $ctrl.currentError }}</p>
+                                    <p>{{ $ctrl.currentMessage }}</p>
                                 </div>
                                 <div class="modal-footer">
-                                    <button class="btn btn-secondary" data-dismiss="modal" ng-click="$ctrl.closeErrorModal()">Close</button>
+                                    <button class="btn btn-secondary" data-dismiss="modal" ng-click="$ctrl.closeCustomModal()">{{ $ctrl.btnText }}</button>
                                 </div>
                             </div>
                         </div>
                     </div>`,
         bindings: {
-            currentError: '@',
-            closeErrorModal: '&',
+            modalTitle: '@',
+            currentMessage: '@',
+            closeCustomModal: '&',
+            btnText: '@',
         },
         controller: function () {
         },

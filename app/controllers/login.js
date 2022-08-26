@@ -46,7 +46,7 @@ angular.module('myApp.login', ['ngRoute'])
                 }
             }
             if (!targetUser || !correctPassword) {
-                $scope.showErrorModal('Utente inesistente o dati errati')
+                $scope.showCustomModal('Utente inesistente o dati errati')
             }
         }
 

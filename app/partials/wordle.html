@@ -1,0 +1,109 @@
+<div ng-controller="WordleController" style="display: flex; flex-direction: column; padding: 20px;">
+    <div style="display: flex; align-items: center">
+        <back-to-list-btn/>
+    </div>
+    <div class="col-md-4 offset-md-4 mb-5">
+        <div ng-repeat="insertedWord in insertedWords">
+            <div class="col-md-12 mb-2" style="display: flex; justify-content: center; align-items: center;">
+                <div ng-class="getLetterBackgroundColor(insertedWord[0], 0)"
+                     class="mr-2"
+                     style="display: flex; justify-content: center; align-items: center; height:50px; width: 50px; border: 1px solid black; color: white; font-size: 18px;">
+                    {{ insertedWord[0].toUpperCase() }}
+                </div>
+                <div ng-class="getLetterBackgroundColor(insertedWord[1], 1)" class="mr-2"
+                     style="display: flex; justify-content: center; align-items: center; height:50px; width: 50px; border: 1px solid black; color: white; font-size: 18px;">
+                    {{ insertedWord[1].toUpperCase() }}
+                </div>
+                <div ng-class="getLetterBackgroundColor(insertedWord[2], 2)" class="mr-2"
+                     style="display: flex; justify-content: center; align-items: center; height:50px; width: 50px; border: 1px solid black; color: white; font-size: 18px;">
+                    {{ insertedWord[2].toUpperCase() }}
+                </div>
+                <div ng-class="getLetterBackgroundColor(insertedWord[3], 3)" class="mr-2"
+                     style="display: flex; justify-content: center; align-items: center; height:50px; width: 50px; border: 1px solid black; color: white; font-size: 18px;">
+                    {{ insertedWord[3].toUpperCase() }}
+                </div>
+                <div ng-class="getLetterBackgroundColor(insertedWord[4], 4)" class="mr-2"
+                     style="display: flex; justify-content: center; align-items: center; height:50px; width: 50px; border: 1px solid black; color: white; font-size: 18px;">
+                    {{ insertedWord[4].toUpperCase() }}
+                </div>
+            </div>
+        </div>
+        <div ng-cloak ng-if="insertedWords.length < 1" class="col-md-12 mb-2"
+             style="display: flex; justify-content: center; align-items: center;">
+            <div ng-class="" class="mr-2" style="height:50px; width: 50px; border: 1px solid black;"></div>
+            <div ng-class="" class="mr-2" style="height:50px; width: 50px; border: 1px solid black;"></div>
+            <div ng-class="" class="mr-2" style="height:50px; width: 50px; border: 1px solid black;"></div>
+            <div ng-class="" class="mr-2" style="height:50px; width: 50px; border: 1px solid black;"></div>
+            <div ng-class="" class="mr-2" style="height:50px; width: 50px; border: 1px solid black;"></div>
+        </div>
+        <div ng-cloak ng-if="insertedWords.length < 2" class="col-md-12 mb-2"
+             style="display: flex; justify-content: center; align-items: center;">
+            <div ng-class="" class="mr-2" style="height:50px; width: 50px; border: 1px solid black;"></div>
+            <div ng-class="" class="mr-2" style="height:50px; width: 50px; border: 1px solid black;"></div>
+            <div ng-class="" class="mr-2" style="height:50px; width: 50px; border: 1px solid black;"></div>
+            <div ng-class="" class="mr-2" style="height:50px; width: 50px; border: 1px solid black;"></div>
+            <div ng-class="" class="mr-2" style="height:50px; width: 50px; border: 1px solid black;"></div>
+        </div>
+        <div ng-cloak ng-if="insertedWords.length < 3" class="col-md-12 mb-2"
+             style="display: flex; justify-content: center; align-items: center;">
+            <div ng-class="" class="mr-2" style="height:50px; width: 50px; border: 1px solid black;"></div>
+            <div ng-class="" class="mr-2" style="height:50px; width: 50px; border: 1px solid black;"></div>
+            <div ng-class="" class="mr-2" style="height:50px; width: 50px; border: 1px solid black;"></div>
+            <div ng-class="" class="mr-2" style="height:50px; width: 50px; border: 1px solid black;"></div>
+            <div ng-class="" class="mr-2" style="height:50px; width: 50px; border: 1px solid black;"></div>
+        </div>
+        <div ng-cloak ng-if="insertedWords.length < 4" class="col-md-12 mb-2"
+             style="display: flex; justify-content: center; align-items: center;">
+            <div ng-class="" class="mr-2" style="height:50px; width: 50px; border: 1px solid black;"></div>
+            <div ng-class="" class="mr-2" style="height:50px; width: 50px; border: 1px solid black;"></div>
+            <div ng-class="" class="mr-2" style="height:50px; width: 50px; border: 1px solid black;"></div>
+            <div ng-class="" class="mr-2" style="height:50px; width: 50px; border: 1px solid black;"></div>
+            <div ng-class="" class="mr-2" style="height:50px; width: 50px; border: 1px solid black;"></div>
+        </div>
+        <div ng-cloak ng-if="insertedWords.length < 5" class="col-md-12 mb-2"
+             style="display: flex; justify-content: center; align-items: center;">
+            <div ng-class="" class="mr-2" style="height:50px; width: 50px; border: 1px solid black;"></div>
+            <div ng-class="" class="mr-2" style="height:50px; width: 50px; border: 1px solid black;"></div>
+            <div ng-class="" class="mr-2" style="height:50px; width: 50px; border: 1px solid black;"></div>
+            <div ng-class="" class="mr-2" style="height:50px; width: 50px; border: 1px solid black;"></div>
+            <div ng-class="" class="mr-2" style="height:50px; width: 50px; border: 1px solid black;"></div>
+        </div>
+        <div ng-cloak ng-if="insertedWords.length < 6" class="col-md-12 mb-2"
+             style="display: flex; justify-content: center; align-items: center;">
+            <div ng-class="" class="mr-2" style="height:50px; width: 50px; border: 1px solid black;"></div>
+            <div ng-class="" class="mr-2" style="height:50px; width: 50px; border: 1px solid black;"></div>
+            <div ng-class="" class="mr-2" style="height:50px; width: 50px; border: 1px solid black;"></div>
+            <div ng-class="" class="mr-2" style="height:50px; width: 50px; border: 1px solid black;"></div>
+            <div ng-class="" class="mr-2" style="height:50px; width: 50px; border: 1px solid black;"></div>
+        </div>
+    </div>
+    <div class="col-md-4 offset-md-4 mt-5" style="display: flex; flex-direction: row;">
+        <div class="col-md-9 p-0 m-0">
+            <input type="text" class="form-control" placeholder="" ng-model="currentWord" ng-required="true">
+        </div>
+        <div class="col-md-3 p-0 m-0">
+            <button class="btn btn-success btn-block" ng-click="submitWord(currentWord.toLowerCase()); currentWord=''"
+                    data-ng-disabled="isDisabledSubmitWord(currentWord)"> Invio
+            </button>
+        </div>
+    </div>
+    <div class="mt-5"
+         style="display: flex; flex-direction: row; justify-content: center">
+        <div ng-repeat="letter in alphabet">
+            <div style="
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 25px;
+                height: 25px;
+                border: 1px solid white;
+                background-color: black;
+                font-size: 25px
+            " ng-class="excludedLetters.includes(letter.toLowerCase()) ? 'text-danger' : 'text-success'">
+                {{letter}}
+            </div>
+        </div>
+    </div>
+    <custom-modal ng-cloak ng-if="!isPlayable && !!gameMessage" modal-title="Risultato" current-message={{gameMessage}}
+                  close-custom-modal="resetGame()" btn-text="Rigioca"/>
+</div>
