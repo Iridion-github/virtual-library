@@ -36,10 +36,6 @@ function getPaginatedBooks(allBooks, booksPerPage) {
     return result;
 }
 
-function generateRandomWord() {
-    return 'right';
-}
-
 angular.module('myApp', [
     'ngRoute',
     'swxLocalStorage',
@@ -182,13 +178,23 @@ angular.module('myApp', [
         return service;
     }])
 
-    .factory('wordleService', ['$rootScope', '$localStorage', function ($rootScope, $localStorage) {
+    .factory('wordleService', ['$rootScope', '$http', function ($rootScope, $http) {
         const service = {
             alphabet: charactersLess,
             getAlphabet: function () {
                 return this.alphabet;
             },
-            targetWord: generateRandomWord(),
+            generateTargetWord: function (originalThis) {
+                $http({
+                    method: 'GET',
+                    url: 'https://random-word-api.herokuapp.com/word?length=5'
+                }).then(function successCallback(response) {
+                    originalThis.setTargetWord(response.data[0]);
+                }, function errorCallback(response) {
+                    $rootScope.$broadcast('error:updated', 'Qualcosa è andato storto durante la generazione della parola');
+                });
+            },
+            targetWord: undefined,
             getTargetWord: function () {
                 return this.targetWord;
             },
@@ -252,7 +258,8 @@ angular.module('myApp', [
                 this.setGreenLetters([]);
                 this.setExcludedLetters([]);
                 this.setCurrentWord('');
-                this.setTargetWord(generateRandomWord());
+                this.generateTargetWord(this);
+                //this.generateTargetWord();
             },
             gameMessage: undefined,
             getGameMessage: function () {
@@ -499,6 +506,8 @@ angular.module('myApp', [
             };
 
             //------------------ wordle ------------------
+            wordleService.resetGame(); //this starts the game
+
             $scope.targetWord = wordleService.getTargetWord();
 
             $scope.$on('targetWord:updated', function (event, data) {
@@ -508,7 +517,6 @@ angular.module('myApp', [
             $scope.currentWord = wordleService.getCurrentWord();
 
             $scope.$on('currentWord:updated', function (event, data) {
-                console.log('set currentWord to:', data);
                 $scope.currentWord = data;
             });
 
