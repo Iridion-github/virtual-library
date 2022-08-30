@@ -112,7 +112,7 @@ input:checked + .slider:before {
         <span class="slider round"></span>
     </label>
      <div ng-if="$ctrl.label && $ctrl.label.length" class="switch-text" data-toggle="tooltip" data-html="true" title={{$ctrl.switchTooltip}}>
-        {{ $ctrl.label }}
+        <b>{{ $ctrl.label }}</b>
     </div>
 </div>`,
     bindings: {
