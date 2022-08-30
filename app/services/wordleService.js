@@ -4,6 +4,18 @@ angular.module('myApp').factory('wordleService', ['$rootScope', '$http', functio
         getAlphabet: function () {
             return this.alphabet;
         },
+        numberOfTries: gameConfig.numberOfTries,
+        hardMode: gameConfig.hardMode,
+        getHardMode: function (){
+            return this.hardMode;
+        },
+        setHardMode: function (value){
+            this.hardMode = value
+            $rootScope.$broadcast('hardMode:updated', value);
+        },
+        getNumberOfTries: function () {
+            return this.numberOfTries;
+        },
         generateTargetWord: function (originalThis) {
             $http({
                 method: 'GET',
@@ -54,7 +66,7 @@ angular.module('myApp').factory('wordleService', ['$rootScope', '$http', functio
             $rootScope.$broadcast('excludedLetters:updated', updatedLetters);
         }
         ,
-        currentWord: { value: '' },
+        currentWord: {value: ''},
         getCurrentWord: function () {
             return this.currentWord;
         },
@@ -97,7 +109,6 @@ angular.module('myApp').factory('wordleService', ['$rootScope', '$http', functio
             this.setIsPlayable(false);
         },
         compareWords: function (currentWord) {
-            console.log('compareWords - this.currentWord:', this.currentWord);
             const currentLetters = currentWord.split('');
             const targetLetters = this.targetWord.split('');
             for (let x = 0; x <= 4; x++) {
@@ -130,6 +141,7 @@ angular.module('myApp').factory('wordleService', ['$rootScope', '$http', functio
                     $rootScope.$broadcast('excludedLetters:updated', excludedLettersUpdated);
                 }
             }
+            //check if game won
             if (currentWord === this.targetWord.value) {
                 this.handleVictory();
                 return;
@@ -137,7 +149,8 @@ angular.module('myApp').factory('wordleService', ['$rootScope', '$http', functio
             const insertedWordsUpdated = [...this.insertedWords, currentWord];
             this.insertedWords = insertedWordsUpdated;
             $rootScope.$broadcast('insertedWords:updated', insertedWordsUpdated);
-            if (insertedWordsUpdated.length > 5) {
+            //check if game lost
+            if (insertedWordsUpdated.length > this.numberOfTries - 1) {
                 if (this.targetWord !== currentWord) {
                     this.handleDefeat();
                 }
@@ -147,10 +160,6 @@ angular.module('myApp').factory('wordleService', ['$rootScope', '$http', functio
         wordIsNonexistent: true,
         getWordIsNonexistent: function () {
             return this.wordIsNonexistent;
-        },
-        setWordIsNonexistent: function (value) {
-            this.wordIsNonexistent = value;
-            $rootScope.$broadcast('wordIsNonexistent:updated', value);
         },
         lastCheckedWord: '',
         getLastCheckedWord: function () {
@@ -174,16 +183,20 @@ angular.module('myApp').factory('wordleService', ['$rootScope', '$http', functio
             if (!this.isPlayable) return this.setIsWordValid(false);
             if (this.insertedWords.includes(word)) return this.setIsWordValid(false);
             if (word.length === 5 && this.lastCheckedWord !== word && this.lastCheckedWord !== word) {
-                this.setLastCheckedWord(word);
-                const originalThis = this;
-                $http({
-                    method: 'GET',
-                    url: `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
-                }).then(function successCallback(response) {
-                    originalThis.setIsWordValid(true);
-                }, function errorCallback(response) {
-                    originalThis.setIsWordValid(false);
-                });
+                if(this.hardMode) {
+                    this.setLastCheckedWord(word);
+                    const originalThis = this;
+                    $http({
+                        method: 'GET',
+                        url: `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
+                    }).then(function successCallback(response) {
+                        originalThis.setIsWordValid(true);
+                    }, function errorCallback(response) {
+                        originalThis.setIsWordValid(false);
+                    });
+                } else {
+                    this.setIsWordValid(true);
+                }
             }
         },
     }
@@ -212,5 +225,8 @@ angular.module('myApp').factory('wordleService', ['$rootScope', '$http', functio
     $rootScope.$on("getIsWordValid", service.getIsWordValid);
     $rootScope.$on("setIsWordValid", service.setIsWordValid);
     $rootScope.$on("checkIsWordValid", service.isWordValid);
+    $rootScope.$on("getNumberOfTries", service.getNumberOfTries);
+    $rootScope.$on("getHardMode", service.getHardMode);
+    $rootScope.$on("setHardMode", service.setHardMode);
     return service;
 }])

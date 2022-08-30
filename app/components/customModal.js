@@ -10,7 +10,9 @@ angular.module('myApp').component('customModal', {
                                     <p>{{ $ctrl.currentMessage }}</p>
                                 </div>
                                 <div class="modal-footer">
-                                    <button class="btn btn-secondary" data-dismiss="modal" ng-click="$ctrl.closeCustomModal()">{{ $ctrl.btnText }}</button>
+                                    <button class="btn btn-secondary" data-dismiss="modal" ng-click="$ctrl.closeCustomModal()">{{ $ctrl.btnText }}
+                                     <i ng-if="$ctrl.btnIcon" class={{$ctrl.btnIcon}}></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -20,6 +22,7 @@ angular.module('myApp').component('customModal', {
         currentMessage: '@',
         closeCustomModal: '&',
         btnText: '@',
+        btnIcon: '@'
     },
     controller: function () {
     },

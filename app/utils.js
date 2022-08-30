@@ -2,6 +2,11 @@ const charactersLess = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
+const gameConfig = {
+    numberOfTries: 6,
+    hardMode: false,
+}
+
 function generateIsbn(length) {
     let result = '';
     for (let i = 0; i < length; i++) {

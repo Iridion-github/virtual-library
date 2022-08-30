@@ -201,11 +201,6 @@ angular.module('myApp', [
                 }
             };
 
-            $scope.wordIsNonexistent = wordleService.getWordIsNonexistent();
-            $scope.$on('wordIsNonexistent:updated', function (event, data) {
-                $scope.wordIsNonexistent = data;
-            });
-
             $scope.lastCheckedWord = wordleService.getLastCheckedWord();
             $scope.$on('lastCheckedWord:updated', function (event, data) {
                 $scope.lastCheckedWord = data;
@@ -247,5 +242,22 @@ angular.module('myApp', [
             $scope.$on('isPlayable:updated', function (event, data) {
                 $scope.isPlayable = data;
             });
+
+            $scope.numberOfTries = wordleService.getNumberOfTries();
+
+            $scope.getEmptyRowsArr = function () {
+                const number = $scope.numberOfTries - $scope.insertedWords.length;
+                const result = [];
+                for (let x = 0; x < number; x++) {
+                    result.push(x);
+                }
+                return result;
+            }
+
+            $scope.hardMode = wordleService.getHardMode();
+
+            $scope.onToggleHardMode = function (newVal) {
+                wordleService.setHardMode(newVal);
+            }
 
         }]);
