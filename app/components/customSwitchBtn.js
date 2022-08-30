@@ -111,7 +111,7 @@ input:checked + .slider:before {
         <input type="checkbox" ng-model="$ctrl.switchValue" ng-change="$ctrl.onToggle()" ng-class="$ctrl.color ? 'switch-input-' + $ctrl.color : 'switch-input-blue'">
         <span class="slider round"></span>
     </label>
-     <div ng-if="$ctrl.label && $ctrl.label.length" class="switch-text">
+     <div ng-if="$ctrl.label && $ctrl.label.length" class="switch-text" data-toggle="tooltip" data-html="true" title={{$ctrl.switchTooltip}}>
         {{ $ctrl.label }}
     </div>
 </div>`,
@@ -120,6 +120,7 @@ input:checked + .slider:before {
         color: '@',
         switchValue: '=',
         onToggle: '=',
+        switchTooltip: '@',
     },
     controller: function () {
     },

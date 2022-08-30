@@ -3,7 +3,7 @@
         <back-to-list-btn/>
         <button class="btn btn-danger" ng-click="resetGame()"> Reset <i class="fa-solid fa-power-off"></i></button>
         <custom-switch-btn switch-value="hardMode" label="Hard mode" color="red" on-toggle="onToggleHardMode(hardMode)"
-                           class="ml-2"/>
+                           class="ml-2" switch-tooltip="Se attiva, possono essere inserite solo parole realmente esistenti"/>
     </div>
     <div class="col-md-4 offset-md-4 mb-5">
         <div ng-repeat="insertedWord in insertedWords">
